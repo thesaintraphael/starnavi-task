@@ -1,5 +1,8 @@
-from typing import Any
+from typing import Any, Iterable
+from threading import Thread
 
+from django.conf import settings
+from django.core.mail import EmailMessage
 from rest_framework import serializers
 
 
@@ -36,3 +39,15 @@ class SerializerUtil:
         serializer.save()
 
         return serializer
+
+
+class EmailUtil:
+    def __init__(self, subject: str, message: str, receivers: Iterable) -> None:
+        self.email = EmailMessage(subject, message, settings.EMAIL_HOST_USER, receivers)
+
+    def send_in_thread(self) -> None:
+
+        Thread(target=self.email.send).start()
+
+    def send_without_thread(self) -> None:
+        self.email.send(fail_silently=False)

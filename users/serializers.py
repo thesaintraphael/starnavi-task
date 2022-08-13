@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from .models import User
-from mainapp.api.utils import SerializerUtil
+from .utils import UserCodeUtil
+from mainapp.api.utils import SerializerUtil, EmailUtil
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -40,7 +41,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password")
         user = super().create(validated_data)
         user.set_password(password)
-
+        user.activation_code = UserCodeUtil.genearte_act_code()
         user.save()
+
+        EmailUtil(
+            subject="Email Verification",
+            message=f"Code: {user.activation_code}",
+            receivers=(user.email,),
+        ).send_in_thread()
 
         return user
