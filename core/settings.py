@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     # apps
     "users.apps.UsersConfig",
     "mainapp.apps.MainappConfig",
+    "posts.apps.PostsConfig",
     # 3rd party apps
     "drf_yasg",
     "rest_framework",
