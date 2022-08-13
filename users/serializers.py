@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 
 from .models import User
 from .utils import UserCodeUtil
@@ -51,3 +52,19 @@ class RegistrationSerializer(serializers.ModelSerializer):
         ).send_in_thread()
 
         return user
+
+
+class VerifyEmailSerializer(serializers.Serializer):
+    activation_code = serializers.CharField(max_length=6)
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+
+        users = User.objects.filter(email=attrs["email"])
+        if users.exists():
+            user = users.first()
+            if not user.is_active and user.activation_code == attrs["activation_code"]:
+                attrs["activation_code"] = ""
+                return attrs
+
+        raise AuthenticationFailed(detail="Wrong email or code provided", code=401)
