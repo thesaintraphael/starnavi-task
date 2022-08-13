@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
 from .utils import UserCodeUtil
@@ -77,6 +78,22 @@ class LoginSerializer(serializers.Serializer):
         raise AuthenticationFailed(
             "Invalid credentials or account is not active", code=401
         )
+
+
+class LogoutSerializer(serializers.Serializer):
+
+    refresh_token = serializers.CharField()
+
+    def validate(self, attrs):
+        try:
+            token = RefreshToken(attrs["refresh_token"])
+            token.blacklist()
+        except TokenError as e:
+            raise AuthenticationFailed(
+                detail="Invalid or expired token", code=400
+            ) from e
+
+        return attrs
 
 
 class VerifyEmailSerializer(serializers.Serializer):

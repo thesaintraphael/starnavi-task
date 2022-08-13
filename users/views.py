@@ -1,9 +1,15 @@
 from rest_framework import generics
+from rest_framework import permissions
 from rest_framework.response import Response
 
 
 from .models import User
-from .serializers import RegistrationSerializer, VerifyEmailSerializer, LoginSerializer
+from .serializers import (
+    LogoutSerializer,
+    RegistrationSerializer,
+    VerifyEmailSerializer,
+    LoginSerializer,
+)
 from mainapp.api.permissions import NotAuthenticated
 
 
@@ -31,6 +37,17 @@ class UserLoginAPIView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
 
         return Response(serializer.data, status=200)
+
+
+class UserLogoutAPIView(generics.GenericAPIView):
+    serializer_class = LogoutSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response({"message": "Logged out successfully"}, status=200)
 
 
 class VerifyEmailAPIView(generics.GenericAPIView):
