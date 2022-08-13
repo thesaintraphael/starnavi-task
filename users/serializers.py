@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import User
-from core.utils import SerializerUtil
+from mainapp.api.utils import SerializerUtil
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
