@@ -10,6 +10,7 @@ class User(AbstractUser):
     reset_code = models.CharField(max_length=6, blank=True)
 
     last_request_date = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=False)
 
     @property
     def fullname(self) -> str:

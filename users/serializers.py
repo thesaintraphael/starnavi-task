@@ -54,6 +54,31 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
+class LoginSerializer(serializers.Serializer):
+
+    username = serializers.CharField()
+    password = serializers.CharField(style={"input_type": "password"}, write_only=True)
+
+    def to_representation(self, instance):
+        repr_ = super().to_representation(instance)
+        repr_["tokens"] = self.user.tokens
+
+        return repr_
+
+    def validate(self, attrs):
+        users = User.objects.filter(username=attrs["username"])
+
+        if users.exists():
+            user = users.first()
+            if user.is_active and user.check_password(attrs["password"]):
+                self.user = user
+                return attrs
+
+        raise AuthenticationFailed(
+            "Invalid credentials or account is not active", code=401
+        )
+
+
 class VerifyEmailSerializer(serializers.Serializer):
     activation_code = serializers.CharField(max_length=6)
     email = serializers.EmailField()

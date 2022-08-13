@@ -1,8 +1,9 @@
 from rest_framework import generics
 from rest_framework.response import Response
 
+
 from .models import User
-from .serializers import RegistrationSerializer, VerifyEmailSerializer
+from .serializers import RegistrationSerializer, VerifyEmailSerializer, LoginSerializer
 from mainapp.api.permissions import NotAuthenticated
 
 
@@ -11,8 +12,25 @@ class UserRegisterAPIView(generics.CreateAPIView):
     serializer_class = RegistrationSerializer
     permission_classes = (NotAuthenticated,)
 
-    def perform_create(self, serializer):
-        serializer.save(is_active=False)
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+
+        return Response(
+            {"message": "Veification email is sent"},
+            status=201,
+        )
+
+
+class UserLoginAPIView(generics.GenericAPIView):
+
+    serializer_class = LoginSerializer
+    permission_classes = (NotAuthenticated,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        return Response(serializer.data, status=200)
 
 
 class VerifyEmailAPIView(generics.GenericAPIView):
