@@ -9,6 +9,7 @@ from .serializers import (
     RegistrationSerializer,
     VerifyEmailSerializer,
     LoginSerializer,
+    UserActivitySerializer,
 )
 from mainapp.api.permissions import NotAuthenticated
 
@@ -69,3 +70,20 @@ class VerifyEmailAPIView(generics.GenericAPIView):
             {"message": "Email verified successfully.", "tokens": user.tokens},
             status=200,
         )
+
+
+class UserActivityAPIView(generics.GenericAPIView):
+
+    serializer_class = UserActivitySerializer
+    queryset = User.objects.all()
+
+    def get(self, request, *args, **kwargs):
+
+        users = request.user
+        many = False
+        if request.user.is_staff:
+            many = True
+            users = self.get_queryset()
+
+        serializer = self.serializer_class(users, many=many)
+        return Response(serializer.data, status=200)

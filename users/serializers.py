@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -72,6 +74,8 @@ class LoginSerializer(serializers.Serializer):
         if users.exists():
             user = users.first()
             if user.is_active and user.check_password(attrs["password"]):
+                user.last_login = timezone.now()
+                user.save()
                 self.user = user
                 return attrs
 
@@ -110,3 +114,9 @@ class VerifyEmailSerializer(serializers.Serializer):
                 return attrs
 
         raise AuthenticationFailed(detail="Wrong email or code provided", code=401)
+
+
+class UserActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("last_request_date", "last_login")
