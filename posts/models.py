@@ -13,6 +13,15 @@ class Post(BaseModel):
     def __str__(self) -> str:
         return self.title
 
+    def get_likes_count(self) -> int:
+        return self.likes.all().count()
+
+    def get_dislikes_count(self) -> int:
+        return self.dislikes.all().count()
+
+    class Meta:
+        ordering = ("-id",)
+
 
 class Like(BaseModel):
     author = models.ForeignKey(

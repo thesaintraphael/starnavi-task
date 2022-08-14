@@ -2,9 +2,9 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Post
-from .serializers import PostSerializer
 from .utils import PostActionUtil
+from .models import Dislike, Like, Post
+from .serializers import LikeSerializer, DislikeSerializer, PostSerializer
 from mainapp.api.permissions import IsAuthorOrReadOnly
 
 
@@ -56,3 +56,31 @@ class PostDislikeAPIView(PostLikeAPIView):
         serializer = self.serializer_class(instance=post)
 
         return Response(serializer.data, status=200)
+
+
+class LikeListAPIView(generics.ListAPIView):
+
+    serializer_class = LikeSerializer
+    queryset = Like.objects.all()
+
+    def get(self, request, post_id, *args, **kwargs):
+
+        serializer = self.serializer_class(
+            self.queryset.filter(post__id=post_id), many=True
+        )
+
+        return Response(serializer.data)
+
+
+class DislikeListAPIView(generics.ListAPIView):
+
+    serializer_class = DislikeSerializer
+    queryset = Dislike.objects.all()
+
+    def get(self, request, post_id, *args, **kwargs):
+
+        serializer = self.serializer_class(
+            self.queryset.filter(post__id=post_id), many=True
+        )
+
+        return Response(serializer.data)
