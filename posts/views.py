@@ -1,10 +1,15 @@
+from django.db.models import Count
+from django.db.models.functions import ExtractDay
+
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework.backends import DjangoFilterBackend
 
+from .filters import LikeFilter
 from .utils import PostActionUtil
-from .models import Dislike, Like, Post
-from .serializers import LikeSerializer, DislikeSerializer, PostSerializer
+from .models import Like, Post
+from .serializers import AnalyticsSerializer, LikeSerializer, PostSerializer
 from mainapp.api.permissions import IsAuthorOrReadOnly
 
 
@@ -47,17 +52,6 @@ class PostLikeAPIView(generics.GenericAPIView):
         return Response(serializer.data, status=200)
 
 
-class PostDislikeAPIView(PostLikeAPIView):
-    def get(self, request, *args, **kwargs):
-
-        post = self.get_object()
-        PostActionUtil(post).create_or_delete_dislike(request.user)
-
-        serializer = self.serializer_class(instance=post)
-
-        return Response(serializer.data, status=200)
-
-
 class LikeListAPIView(generics.ListAPIView):
 
     serializer_class = LikeSerializer
@@ -72,15 +66,23 @@ class LikeListAPIView(generics.ListAPIView):
         return Response(serializer.data)
 
 
-class DislikeListAPIView(generics.ListAPIView):
+class LikeAnalyticsAPIView(generics.ListAPIView):
 
-    serializer_class = DislikeSerializer
-    queryset = Dislike.objects.all()
+    queryset = Like.objects.all()
+    serializer_class = AnalyticsSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = LikeFilter
+    pagination_class = None
 
-    def get(self, request, post_id, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
 
-        serializer = self.serializer_class(
-            self.queryset.filter(post__id=post_id), many=True
-        )
+        qs = (
+            self.get_queryset()
+            .annotate(day=ExtractDay("created_at"))
+            .values("day")
+            .annotate(likes_count=Count("id"))
+        ).order_by("day")
 
-        return Response(serializer.data)
+        serializer = self.serializer_class(qs, many=True)
+
+        return Response(serializer.data, status=200)

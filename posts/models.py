@@ -16,9 +16,6 @@ class Post(BaseModel):
     def get_likes_count(self) -> int:
         return self.likes.all().count()
 
-    def get_dislikes_count(self) -> int:
-        return self.dislikes.all().count()
-
     class Meta:
         ordering = ("-id",)
 
@@ -29,9 +26,5 @@ class Like(BaseModel):
     )
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")
 
-
-class Dislike(BaseModel):
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="dislikes"
-    )
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="dislikes")
+    class Meta:
+        ordering = ("-id",)

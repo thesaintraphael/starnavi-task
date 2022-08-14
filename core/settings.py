@@ -31,10 +31,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # apps
     "users.apps.UsersConfig",
-    "mainapp.apps.MainappConfig",
     "posts.apps.PostsConfig",
+    "mainapp.apps.MainappConfig",
     # 3rd party apps
     "drf_yasg",
+    "django_filters",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
 ]
