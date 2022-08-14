@@ -12,3 +12,11 @@ class DateUtil:
 
     def format_str_to_date(self) -> Union[datetime, None]:
         return datetime.strptime(self.date, "%Y-%m-%d") if self.date else None
+
+    def is_str_in_datetime_format(self) -> bool:
+
+        try:
+            datetime.strptime(self.date, "%Y-%m-%d")
+            return True
+        except ValueError:
+            return False

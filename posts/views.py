@@ -72,7 +72,6 @@ class LikeAnalyticsAPIView(generics.ListAPIView):
     serializer_class = AnalyticsSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = LikeFilter
-    permission_classes = (AllowAny,)
     pagination_class = None
 
     def get_queryset(self):
