@@ -7,13 +7,13 @@ from mainapp.utils import DateUtil
 
 class LikeFilter(django_filters.FilterSet):
 
-    start_date = django_filters.DateTimeFilter(
+    date_from = django_filters.DateTimeFilter(
         field_name="created_at",
         lookup_expr="gte",
         required=True,
     )
 
-    end_date = django_filters.DateTimeFilter(
+    date_to = django_filters.DateTimeFilter(
         field_name="created_at",
         lookup_expr="lte",
         required=True,
@@ -23,7 +23,7 @@ class LikeFilter(django_filters.FilterSet):
 
     class Meta:
         model = Like
-        fields = ("start_date", "end_date", "post_id")
+        fields = ("date_from", "date_to", "post_id")
 
     def is_valid(self):
         self.validate_datetime(self.request)
@@ -34,23 +34,23 @@ class LikeFilter(django_filters.FilterSet):
 
         error_dict = {}
 
-        start_date = DateUtil(request.query_params.get("start_date"))
-        end_date = DateUtil(request.query_params.get("end_date"))
+        date_from = DateUtil(request.query_params.get("date_from"))
+        date_to = DateUtil(request.query_params.get("date_to"))
 
-        if start_date.date and end_date.date:
+        if date_from.date and date_to.date:
 
-            if start_date.is_str_in_datetime_format() and end_date.is_str_in_datetime_format():
+            if date_from.is_str_in_datetime_format() and date_to.is_str_in_datetime_format():
 
-                if start_date.format_str_to_date() > end_date.format_str_to_date():
+                if date_from.format_str_to_date() > date_to.format_str_to_date():
                     error_dict[
-                        "start_date"
-                    ] = "start_date must be less/equal than end_date"
+                        "date_from"
+                    ] = "date_from must be less/equal than date_to"
 
             else:
                 error_dict["error"] = "dates must be in YYYY-MM-DD format"
 
         else:
-            error_dict["error"] = "start_date and end_date are both required"
+            error_dict["error"] = "date_from and date_to are both required"
 
         if error_dict:
             raise ValidationError(error_dict)
