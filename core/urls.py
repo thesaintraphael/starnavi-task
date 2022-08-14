@@ -7,6 +7,7 @@ from mainapp.api.swagger_schema import schema_view
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/users/", include("users.urls")),
+    path("api/posts/", include("posts.urls")),
     # Swagger API documentation
     path(
         "",
