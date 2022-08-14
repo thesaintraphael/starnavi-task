@@ -1,8 +1,10 @@
 from rest_framework import generics
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Post
 from .serializers import PostSerializer
+from .utils import PostActionUtil
 from mainapp.api.permissions import IsAuthorOrReadOnly
 
 
@@ -27,3 +29,30 @@ class PostDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
         IsAuthorOrReadOnly,
     )
     lookup_field = "id"
+
+
+class PostLikeAPIView(generics.GenericAPIView):
+
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    lookup_field = "id"
+
+    def get(self, request, *args, **kwargs):
+
+        post = self.get_object()
+        PostActionUtil(post).create_or_delete_like(request.user)
+
+        serializer = self.serializer_class(instance=post)
+
+        return Response(serializer.data, status=200)
+
+
+class PostDislikeAPIView(PostLikeAPIView):
+    def get(self, request, *args, **kwargs):
+
+        post = self.get_object()
+        PostActionUtil(post).create_or_delete_dislike(request.user)
+
+        serializer = self.serializer_class(instance=post)
+
+        return Response(serializer.data, status=200)

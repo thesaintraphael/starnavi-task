@@ -7,4 +7,6 @@ urlpatterns = [
     path("list/", views.PostListAPIView.as_view(), name="list"),
     path("create/", views.PostCreateAPIView.as_view(), name="create"),
     path("detail/<int:id>", views.PostDetailAPIView.as_view(), name="detail"),
+    path("like/<int:id>", views.PostLikeAPIView.as_view(), name="like"),
+    path("dislike/<int:id>", views.PostDislikeAPIView.as_view(), name="dislike"),
 ]
