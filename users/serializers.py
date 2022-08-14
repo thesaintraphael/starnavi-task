@@ -6,7 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from .models import User
 from .utils import UserCodeUtil
-from mainapp.utils import format_date
+from mainapp.utils import DateUtil
 from mainapp.api.utils import SerializerUtil, EmailUtil
 
 
@@ -126,7 +126,9 @@ class UserActivitySerializer(serializers.ModelSerializer):
         repr_ = super().to_representation(instance)
 
         repr_["user_id"] = instance.id
-        repr_["last_request_date"] = format_date(instance.last_request_date)
-        repr_["last_login"] = format_date(instance.last_login)
+        repr_["last_request_date"] = DateUtil(
+            instance.last_request_date
+        ).format_date_to_str()
+        repr_["last_login"] = DateUtil(instance.last_login).format_date_to_str()
 
         return repr_

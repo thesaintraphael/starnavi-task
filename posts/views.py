@@ -3,7 +3,7 @@ from django.db.models.functions import ExtractDay
 
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django_filters.rest_framework.backends import DjangoFilterBackend
 
 from .filters import LikeFilter
@@ -72,17 +72,15 @@ class LikeAnalyticsAPIView(generics.ListAPIView):
     serializer_class = AnalyticsSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = LikeFilter
+    permission_classes = (AllowAny,)
     pagination_class = None
 
-    def get(self, request, *args, **kwargs):
-
-        qs = (
-            self.get_queryset()
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
             .annotate(day=ExtractDay("created_at"))
             .values("day")
             .annotate(likes_count=Count("id"))
-        ).order_by("day")
-
-        serializer = self.serializer_class(qs, many=True)
-
-        return Response(serializer.data, status=200)
+            .order_by("day")
+        )
