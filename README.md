@@ -15,8 +15,8 @@
      2. Install requirements: 
             pip install -r requirements.txt
 
-     3. Create .env file and env variable to it.
-        Email credential are required to sign up and verify account, you can 
+     3. Create .env file and and env variables to it.
+        Email credentials are required to sign up and verify account, you can 
         add your own credentials to .env or you use test account I 
         created. (credentials are in core/credentials.py)
 
