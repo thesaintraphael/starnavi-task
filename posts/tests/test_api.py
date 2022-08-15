@@ -21,7 +21,7 @@ class TestPostAPI(TestSetup):
         }
 
     @staticmethod
-    def make_data_invlid(data: dict) -> dict:
+    def make_data_invalid(data: dict) -> dict:
         data["title"] = ""
         return data
 
@@ -42,7 +42,7 @@ class TestPostAPI(TestSetup):
 
     def test_create_post_with_invalid_data(self) -> None:
 
-        data = self.make_data_invlid(self.data.copy())
+        data = self.make_data_invalid(self.data.copy())
 
         response = self.client.post(
             POST_CREATE_URL, data=json.dumps(data), content_type="application/json"
@@ -56,21 +56,23 @@ class TestPostAPI(TestSetup):
         )
         self.assertEqual(response.status_code, 201)
 
-    def test_create_list_endpoint(self) -> None:
-
+    def test_list_endpoint_with_no_data(self) -> None:
         response = self.client.get(POST_LIST_URL)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["count"], 0)
+
+    def test_list_endpoint_with_data(self) -> None:
 
         self.create_post()
 
         response = self.client.get(POST_LIST_URL)
         self.assertEqual(response.json()["count"], 1)
 
-    def test_detail_endpoint(self) -> None:
-
+    def test_detail_endpoint_with_no_data(self) -> None:
         response = self.client.get(POST_DETAIL_URL)
         self.assertEqual(response.status_code, 404)
+
+    def test_detail_endpoint_with_data(self) -> None:
 
         self.create_post()
 
