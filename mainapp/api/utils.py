@@ -46,7 +46,6 @@ class EmailUtil:
         self.email = EmailMessage(subject, message, settings.EMAIL_HOST_USER, receivers)
 
     def send_in_thread(self) -> None:
-
         Thread(target=self.email.send).start()
 
     def send_without_thread(self) -> None:
